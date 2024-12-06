@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr. Schmidt's Interactive Linear Regression Graph Maker</title>
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="center-align">Mr. Schmidt's Interactive Linear Regression Graph Maker</h1>
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>Upload Dataset (Optional)</span>
+                    <input type="file" id="file" name="file">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+            </div>
+        </form>
+        <h2 class="center-align">Generated Plot: Here's the Visual!</h2>
+        <div class="center-align">
+            <img id="plotImage" src="data:image/png;base64,{{ img_data }}" class="responsive-img">
+        </div>
+        <div class="input-field">
+            <p class="range-field">
+                <label for="nth_pt">Adjust Starting Point for Regression (nth point -- 0 to 20 pts for now):</label>
+                <input type="range" id="nth_pt" name="nth_pt" min="0" max="20" value="{{ nth_pt }}" oninput="updatePlot()">
+            </p>
+            <span id="nth_pt_value" class="badge">{{ nth_pt }}</span>
+        </div>
+        <button type="button" class="btn waves-effect waves-light" onclick="updatePlot()">Update the Plot!</button>
+        <h2 class="center-align">Dataset</h2>
+        <table class="striped centered">
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>X Value</th>
+                    <th>Y Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row['X'] }}</td>
+                    <td>{{ row['Y'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Materialize JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        function updatePlot() {
+            const nthPt = document.getElementById('nth_pt').value;
+            document.getElementById('nth_pt_value').innerText = nthPt;
+
+            const formData = new FormData(document.getElementById('uploadForm'));
+            formData.append('nth_pt', nthPt);
+
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('plotImage').src = 'data:image/png;base64,' + data.img_data;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
