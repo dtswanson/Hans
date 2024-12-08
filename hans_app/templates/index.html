@@ -6,6 +6,8 @@
     <title>Mr. Schmidt's Interactive Linear Regression Graph Maker</title>
     <!-- Materialize CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -13,7 +15,7 @@
         <form method="POST" enctype="multipart/form-data" id="uploadForm">
             <div class="file-field input-field">
                 <div class="btn">
-                    <span>Upload Dataset (Optional)</span>
+                    <span><i class="material-icons left">file_upload</i>Upload Dataset (Optional)</span>
                     <input type="file" id="file" name="file">
                 </div>
                 <div class="file-path-wrapper">
@@ -21,6 +23,14 @@
                 </div>
             </div>
         </form>
+        <div class="center-align">
+            <a href="https://eu.pythonanywhere.com/user/MISdswanson/files/home/MISdswanson/mysite/PvsV%20test%20plot%20data.xlsx" class="btn">
+                <i class="material-icons left">play_arrow</i>Try it Now
+            </a>
+        <button type="button" class="btn waves-effect waves-light" onclick="updatePlot()">
+        <i class="material-icons left">refresh</i>Update the Plot!
+        </button>
+        </div>
         <h2 class="center-align">Generated Plot: Here's the Visual!</h2>
         <div class="center-align">
             <img id="plotImage" src="data:image/png;base64,{{ img_data }}" class="responsive-img">
@@ -32,7 +42,6 @@
             </p>
             <span id="nth_pt_value" class="badge">{{ nth_pt }}</span>
         </div>
-        <button type="button" class="btn waves-effect waves-light" onclick="updatePlot()">Update the Plot!</button>
         <h2 class="center-align">Dataset</h2>
         <table class="striped centered">
             <thead>
@@ -73,6 +82,13 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('plotImage').src = 'data:image/png;base64,' + data.img_data;
+                const tableBody = document.querySelector('tbody');
+                tableBody.innerHTML = '';
+                data.data.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${index + 1}</td><td>${row['X']}</td><td>${row['Y']}</td>`;
+                    tableBody.appendChild(tr);
+                });
             })
             .catch(error => console.error('Error:', error));
         }
